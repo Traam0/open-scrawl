@@ -1,3 +1,4 @@
+import re
 import requests
 from bs4 import BeautifulSoup
 import time
@@ -164,7 +165,8 @@ def scrape_items(soup: BeautifulSoup, container_selector: str, field_extractors:
                 extractor_type = config.get('type', 'text')
                 
                 if extractor_type == 'text':
-                    row[field_name] = extract_text(item, selector)
+                    dataType = config.get("dataType", "text")
+                    row[field_name] = parse_number(extract_text(item, selector)) if dataType == 'number' else extract_text(item, selector)
                 elif extractor_type == 'attribute':
                     attribute = config.get('attribute', 'href')
                     row[field_name] = extract_attribute(item, selector, attribute)
@@ -181,3 +183,21 @@ def scrape_items(soup: BeautifulSoup, container_selector: str, field_extractors:
     
     print(f"Successfully extracted {len(data)} items")
     return data
+
+
+
+def parse_number(text):
+    """
+    Extracts the first int or float from text.
+    Returns int if whole number, float otherwise.
+    Returns None if no number found.
+    """
+    if text is None:
+        return None
+
+    match = re.search(r"-?\d+(\.\d+)?", str(text))
+    if not match:
+        return None
+
+    num = float(match.group())
+    return int(num) if num.is_integer() else num

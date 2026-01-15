@@ -8,8 +8,6 @@ Container Selector: li.product
 Field Mappings:
   - name: h2.woocommerce-loop-product__title (content, text)
   - price: span.woocommerce-Price-amount (content, number)
-  - url: a.woocommerce-LoopProduct-link (attribute[href], text)
-  - image: img.attachment-woocommerce_thumbnail (attribute[src], text)
 """
 
 from scraper_utils import fetch_page, scrape_items, generate_pagination_urls
@@ -26,12 +24,10 @@ OUTPUT_FILE = "scraped_data.csv"
 # Field extractors configuration
 FIELD_EXTRACTORS = {
     'name': {"selector":"h2.woocommerce-loop-product__title","type":"text","dataType":"text"},
-    'price': {"selector":"span.woocommerce-Price-amount","type":"text","dataType":"number"},
-    'url': {"selector":"a.woocommerce-LoopProduct-link","type":"attribute","dataType":"text","attribute":"href"},
-    'image': {"selector":"img.attachment-woocommerce_thumbnail","type":"attribute","dataType":"text","attribute":"src"}
+    'price': {"selector":"span.woocommerce-Price-amount","type":"text","dataType":"number"}
 }
 
-FIELDNAMES = ["name","price","url","image"]
+FIELDNAMES = ["name","price"]
 
 
 def main():
