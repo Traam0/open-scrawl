@@ -70,7 +70,7 @@ const useSetup = create<State & Actions>()(
         set({ selectors: get().selectors.filter((x) => x.id !== selector.id) }),
     }),
     {
-      name: "setup",
+      name: "setupOptions",
       storage: createJSONStorage(() => localStorage),
     }
   )

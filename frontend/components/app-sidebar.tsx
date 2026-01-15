@@ -30,7 +30,13 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { BrushCleaning, ChartArea, Database, Globe, TrendingUpDown } from "lucide-react";
+import {
+  BrushCleaning,
+  ChartArea,
+  Database,
+  Globe,
+  TrendingUpDown,
+} from "lucide-react";
 
 const data = {
   user: {
@@ -51,7 +57,7 @@ const data = {
     },
     {
       title: "Data Cleaning",
-      url: "#",
+      url: "/clean",
       icon: BrushCleaning,
     },
     {
@@ -59,11 +65,11 @@ const data = {
       url: "#",
       icon: ChartArea,
     },
-    {
-      title: "Predictions",
-      url: "#",
-      icon: TrendingUpDown,
-    },
+    // {
+    //   title: "Predictions",
+    //   url: "#",
+    //   icon: TrendingUpDown,
+    // },
   ],
   navClouds: [
     {
@@ -173,7 +179,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
-        <span className="text-sm text-center group-data-[collapsible=icon]:hidden ">version 0.1.0</span>
+        <span className="text-sm text-center group-data-[collapsible=icon]:hidden ">
+          version 0.1.0
+        </span>
       </SidebarFooter>
     </Sidebar>
   );

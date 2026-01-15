@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/empty";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Frown } from "lucide-react";
+import { Frown, Smile } from "lucide-react";
 import {
   Card,
   CardAction,
@@ -31,7 +31,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { IconTrendingDown, IconTrendingUp } from "@tabler/icons-react";
 import { Badge } from "@/components/ui/badge";
 import {
   Pagination,
@@ -42,22 +41,35 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { useSearchParams } from "next/navigation";
 export default function Page({ data, pagination, statistics }: Data) {
+  const searchParams = useSearchParams();
   return (
     <Layout>
       <SiteHeader title="Raw Data" />
       <div className="flex flex-1 flex-col">
         <div className="@container/main flex flex-1 flex-col gap-2 px-4 lg:px-6">
           <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-            <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
+            <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-2 gap-4  *:data-[slot=card]:bg-linear-to-t *:data-[slot=card]:shadow-xs @xl/main:grid-cols-2 @5xl/main:grid-cols-5">
+              <Card className="@container/card">
+                <CardHeader>
+                  <CardDescription>Total Pages</CardDescription>
+                  <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
+                    {pagination?.totalPages ?? 0}
+                  </CardTitle>
+                  <CardAction>
+                    <Badge variant="outline">{pagination?.pageSize}/page</Badge>
+                  </CardAction>
+                </CardHeader>
+              </Card>
               <Card className="@container/card">
                 <CardHeader>
                   <CardDescription>Total Rows</CardDescription>
                   <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-                    {statistics.totalRows}
+                    {statistics?.totalRows ?? 0}
                   </CardTitle>
                   <CardAction>
-                    <Badge variant="outline">+12.5%</Badge>
+                    <Badge variant="outline"></Badge>
                   </CardAction>
                 </CardHeader>
               </Card>
@@ -65,7 +77,7 @@ export default function Page({ data, pagination, statistics }: Data) {
                 <CardHeader>
                   <CardDescription>Columns count</CardDescription>
                   <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-                    {statistics.totalColumns}
+                    {statistics?.totalColumns ?? 0}
                   </CardTitle>
                   <CardAction>
                     <Badge variant="outline">-20%</Badge>
@@ -76,7 +88,7 @@ export default function Page({ data, pagination, statistics }: Data) {
                 <CardHeader>
                   <CardDescription>Missing Values</CardDescription>
                   <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-                    {statistics.totalMissingValues}
+                    {statistics?.totalMissingValues ?? 0}
                   </CardTitle>
                   <CardAction>
                     <Badge variant="outline">+12.5%</Badge>
@@ -87,18 +99,51 @@ export default function Page({ data, pagination, statistics }: Data) {
                 <CardHeader>
                   <CardDescription>Completeness</CardDescription>
                   <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-                    {statistics.completenessRate}%
+                    {statistics?.completenessRate ?? 0}%
                   </CardTitle>
                   <CardAction>
-                    <Badge variant="outline">
-                      <IconTrendingUp />
-                      +4.5%
+                    <Badge
+                      variant={
+                        statistics?.completenessRate > 50
+                          ? "secondary"
+                          : "destructive"
+                      }
+                    >
+                      {statistics?.completenessRate > 50 ? (
+                        <Smile />
+                      ) : (
+                        <Frown />
+                      )}
                     </Badge>
                   </CardAction>
                 </CardHeader>
               </Card>
             </div>
-            {data.length != 0 ? (
+            <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-2 gap-4  *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
+              {statistics &&
+                statistics.columnStats.map((stat) => (
+                  <Card key={stat.columnName} className="@container/card">
+                    <CardHeader>
+                      <CardDescription>{stat.columnName}</CardDescription>
+                      <CardTitle className="text-xl font-semibold tabular-nums @[250px]/card:text-2xl">
+                        {stat.missingCount} NULL
+                      </CardTitle>
+                      <CardAction>
+                        <Badge
+                          variant={
+                            stat.missingPercentage > 50
+                              ? "destructive"
+                              : "secondary"
+                          }
+                        >
+                          {stat.missingPercentage}%
+                        </Badge>
+                      </CardAction>
+                    </CardHeader>
+                  </Card>
+                ))}
+            </div>
+            {data && data.length != 0 ? (
               <>
                 <Table>
                   <TableHeader>
@@ -111,8 +156,8 @@ export default function Page({ data, pagination, statistics }: Data) {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {data.map((row: any) => (
-                      <TableRow key={row}>
+                    {data.map((row: any, index) => (
+                      <TableRow key={row + index}>
                         {Object.values(row).map((value, colIndex) => (
                           <TableCell key={colIndex}>{String(value)}</TableCell>
                         ))}
@@ -131,24 +176,46 @@ export default function Page({ data, pagination, statistics }: Data) {
                 <Pagination>
                   <PaginationContent>
                     <PaginationItem>
-                      <PaginationPrevious href="#" />
+                      <PaginationPrevious
+                        className={
+                          pagination.hasPreviousPage
+                            ? ""
+                            : "pointer-none bg-muted text-muted-foreground"
+                        }
+                        href={`?page=${pagination.page - 1}`}
+                      />
                     </PaginationItem>
-                    <PaginationItem>
-                      <PaginationLink href="#">1</PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem>
-                      <PaginationLink href="#" isActive>
-                        2
-                      </PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem>
-                      <PaginationLink href="#">3</PaginationLink>
-                    </PaginationItem>
+                    {Array.from<number>({ length: pagination.totalPages })
+                      .slice(0, 3)
+                      .map((_, index) => (
+                        <PaginationItem key={index}>
+                          <PaginationLink
+                            isActive={
+                              index + 1 == Number(searchParams.get("page"))
+                            }
+                            href={`?page=${index + 1}`}
+                          >
+                            {index + 1}
+                          </PaginationLink>
+                        </PaginationItem>
+                      ))}
                     <PaginationItem>
                       <PaginationEllipsis />
                     </PaginationItem>
                     <PaginationItem>
-                      <PaginationNext href="#" />
+                      <PaginationLink href={`?page=${pagination.totalPages}`}>
+                        {pagination.totalPages}
+                      </PaginationLink>
+                    </PaginationItem>
+                    <PaginationItem>
+                      <PaginationNext
+                        className={
+                          pagination.hasNextPage
+                            ? ""
+                            : "pointer-none bg-muted text-muted-foreground"
+                        }
+                        href={`?page=${pagination.page + 1}`}
+                      />
                     </PaginationItem>
                   </PaginationContent>
                 </Pagination>
