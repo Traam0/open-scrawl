@@ -40,6 +40,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { toast } from "sonner";
 
 export default function Page() {
   const {
@@ -98,14 +99,15 @@ export default function Page() {
                         placeholder="http://example.com/products/{}"
                       />
                       <FieldDescription>
-                        URL pattern used for paginated pages. Use {"{page}"} as a
-                        placeholder for the page number (e.g., /page/{"{page}"}).
+                        URL pattern used for paginated pages. Use {"{page}"} as
+                        a placeholder for the page number (e.g., /page/
+                        {"{page}"}).
                       </FieldDescription>
                     </Field>
                   </FieldGroup>
                   <FieldGroup className="flex-row items-end">
                     <Field>
-                      <FieldLabel>Data Container Selector</FieldLabel>
+                      <FieldLabel>Target Pages Count </FieldLabel>
                       <Input
                         disabled={!!!paginationUrlTemplate}
                         type="number"
@@ -307,7 +309,10 @@ export default function Page() {
                     }),
                   })
                     .then((r) => r.json())
-                    .then((r) => setScript(r.script))
+                    .then((r) => {
+                      setScript(r.script);
+                      toast.success("Script generated.", {});
+                    })
                     .catch(console.error);
                 }}
               >

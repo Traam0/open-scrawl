@@ -42,8 +42,11 @@ yarn-error.log*
 # ========================
 
 # virtual environments
-backend/venv/
+generated/venv/
+generated/.venv/
+generated/*.csv
 venv/
+.venv/
 .env/
 .env.*
 

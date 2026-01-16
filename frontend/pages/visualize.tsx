@@ -35,6 +35,15 @@ import {
   TrendingUp,
   Database,
 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type ColumnInfo = {
   name: string;
@@ -104,7 +113,9 @@ export default function VisualizationPage() {
 
       setData(result);
       if (result.numericColumns.length > 0) {
-        setSelectedColumn(result.numericColumns[0]);
+        setSelectedColumn(
+          result.numericColumns[0] ?? result.categoricalColumns[0]
+        );
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load data");
@@ -267,31 +278,36 @@ export default function VisualizationPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <select
+                <Select
                   value={selectedColumn}
-                  onChange={(e) => setSelectedColumn(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-md"
+                  onValueChange={setSelectedColumn}
                 >
-                  <option value="">Select a column...</option>
-                  {data.numericColumns.length > 0 && (
-                    <optgroup label="Numeric Columns">
-                      {data.numericColumns.map((col) => (
-                        <option key={col} value={col}>
-                          {col}
-                        </option>
-                      ))}
-                    </optgroup>
-                  )}
-                  {data.categoricalColumns.length > 0 && (
-                    <optgroup label="Categorical Columns">
-                      {data.categoricalColumns.map((col) => (
-                        <option key={col} value={col}>
-                          {col}
-                        </option>
-                      ))}
-                    </optgroup>
-                  )}
-                </select>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select a column..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {data.numericColumns.length > 0 && (
+                      <SelectGroup>
+                        <SelectLabel>Numeric Columns</SelectLabel>
+                        {data.numericColumns.map((col) => (
+                          <SelectItem key={col} value={col}>
+                            {col}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    )}
+                    {data.categoricalColumns.length > 0 && (
+                      <SelectGroup>
+                        <SelectLabel>Categorical Columns</SelectLabel>
+                        {data.categoricalColumns.map((col) => (
+                          <SelectItem key={col} value={col}>
+                            {col}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    )}
+                  </SelectContent>
+                </Select>
               </CardContent>
             </Card>
 

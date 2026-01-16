@@ -6,7 +6,7 @@ Configuration:
 - Target Column: all
 - Null Handling Strategy: custom
 - Normalization: disabled
-- Trim Whitespaces: false
+- Trim Whitespaces: true
 - Remove Duplicates: true
 """
 
@@ -57,13 +57,17 @@ def clean_data(input_file: str, output_file: str):
         # Display initial statistics
         print_statistics(df, "Initial Data Statistics")
           #
+        # Trim whitespaces
+        print("\nTrimming whitespaces...")
+        df = trim_whitespaces(df)
+		
         # Remove duplicate rows
         print("\nRemoving duplicate rows...")
         df = remove_duplicates(df)
 		
         # Handle null values (custom)
         print("\nHandling null values using strategy: custom")
-        df = fill_nulls_with_custom(df, "696969", 'all')
+        df = fill_nulls_with_custom(df, "none", 'all')
         
         # Save cleaned data
         print("\n💾 Saving cleaned data...")

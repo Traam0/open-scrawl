@@ -31,6 +31,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import {
+  Brain,
   BrushCleaning,
   ChartArea,
   Database,
@@ -62,8 +63,13 @@ const data = {
     },
     {
       title: "Visualization",
-      url: "#",
+      url: "/visualize",
       icon: ChartArea,
+    },
+    {
+      title: "Models",
+      url: "/models",
+      icon: Brain,
     },
     // {
     //   title: "Predictions",

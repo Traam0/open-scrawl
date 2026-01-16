@@ -133,10 +133,10 @@ def main():
         print(f"Total items collected: {len(all_data)}\\n")
         
         # Add delay between requests to be polite
-        if page_num < len(urls):
-            import time
-            print("Waiting 1 second before next page...")
-            time.sleep(1)
+        #if page_num < len(urls):
+            #import time
+            #print("Waiting 1 second before next page...")
+            #time.sleep(1)
     `
         : `
     # Fetch single page
