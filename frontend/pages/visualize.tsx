@@ -16,8 +16,6 @@ import {
   Line,
   PieChart,
   Pie,
-  ScatterChart,
-  Scatter,
   XAxis,
   YAxis,
   CartesianGrid,
