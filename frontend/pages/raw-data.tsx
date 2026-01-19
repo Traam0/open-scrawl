@@ -251,7 +251,7 @@ export default function Page({ data, pagination, statistics }: Data) {
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   try {
     const { data } = await axios.get<Data>(
-      `/api/data?page=${ctx.query.page ?? 1}`
+      `/api/data?page=${ctx.query.page ?? 1}&pageSize=${ctx.query.pageSize ?? 10}`,
     );
     return {
       props: data,

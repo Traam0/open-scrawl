@@ -563,7 +563,6 @@ export default function VisualizationPage() {
               </>
             )}
 
-            {/* All Columns Overview */}
             <Card>
               <CardHeader>
                 <CardTitle>Column Overview</CardTitle>
@@ -595,7 +594,7 @@ export default function VisualizationPage() {
                     </thead>
                     <tbody>
                       {data.columns.map((col, idx) => (
-                        <tr key={idx} className="border-b hover:bg-slate-50">
+                        <tr key={idx} className="border-b">
                           <td className="px-4 py-2 text-sm font-medium">
                             {col.name}
                           </td>

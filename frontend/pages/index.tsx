@@ -201,6 +201,7 @@ export default function Page() {
                       <FieldLabel>Selection Mode</FieldLabel>
                       <Select
                         defaultValue="content"
+                        value={f.selectorType}
                         onValueChange={(v) =>
                           updateSelector({ ...f, selectorType: v as any })
                         }
@@ -234,6 +235,7 @@ export default function Page() {
                       <FieldLabel>Data Type</FieldLabel>
                       <Select
                         defaultValue="text"
+                        value={f.dataType}
                         onValueChange={(v) =>
                           updateSelector({ ...f, dataType: v as any })
                         }

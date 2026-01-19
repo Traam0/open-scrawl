@@ -4,9 +4,9 @@ Classification with Imbalance Handling
 
 Configuration:
 - Target Variable: contract_type
-- Features: job_sector, job_title
+- Features: job_function, job_sector, job_title, experience_level, education_level
 - Model Type: DECISION TREE
-- Balancing: BOTH
+- Balancing: SMOTE
 - Test Size: 20%
 """
 
@@ -184,15 +184,6 @@ def train_models(input_file: str, output_file: str, config: dict):
         metrics_balanced_smote = calculate_metrics(y_test, y_pred_balanced_smote, le)
         print_metrics("SMOTE-Balanced Model", metrics_balanced_smote)
 
-    # Train model with class weights
-        print("\nTraining model with class weights...")
-        model_balanced_weights = DecisionTreeClassifier(class_weight='balanced', random_state=42)
-        model_balanced_weights.fit(X_train, y_train)
-        y_pred_balanced_weights = model_balanced_weights.predict(X_test)
-        
-        metrics_balanced_weights = calculate_metrics(y_test, y_pred_balanced_weights, le)
-        print_metrics("Class-Weighted Model", metrics_balanced_weights)
-
         
         results = {
             'configuration': config,
@@ -221,11 +212,6 @@ def train_models(input_file: str, output_file: str, config: dict):
             'metrics': metrics_balanced_smote
         }
 
-        results['models']['class_weighted'] = {
-            'model_type': 'decision_tree',
-            'balancing': 'Class Weights',
-            'metrics': metrics_balanced_weights
-        }
         
         
         with open(output_file, 'w', encoding='utf-8') as f:
@@ -234,7 +220,7 @@ def train_models(input_file: str, output_file: str, config: dict):
         print("\nModel Comparison (F1-Score):")
         print(f"  Baseline: {metrics_baseline['f1_score']:.4f}")
         print(f"  SMOTE:    {metrics_balanced_smote['f1_score']:.4f}")
-        print(f"  Weighted: {metrics_balanced_weights['f1_score']:.4f}")
+
         
         # Execution time
         end_time = datetime.now()
@@ -257,9 +243,9 @@ if __name__ == "__main__":
     
     CONFIG = {
         'target': 'contract_type',
-        'features': ["job_sector","job_title"],
+        'features': ["job_function","job_sector","job_title","experience_level","education_level"],
         'model_type': 'decision_tree',
-        'balancing': 'both',
+        'balancing': 'smote',
         'test_size': 0.2,
         'random_state': 42
     }

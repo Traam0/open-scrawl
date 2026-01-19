@@ -4,7 +4,7 @@ Generated automatically
 
 Configuration:
 - Target Column: all
-- Null Handling Strategy: custom
+- Null Handling Strategy: rows
 - Normalization: disabled
 - Trim Whitespaces: true
 - Remove Duplicates: true
@@ -65,9 +65,9 @@ def clean_data(input_file: str, output_file: str):
         print("\nRemoving duplicate rows...")
         df = remove_duplicates(df)
 		
-        # Handle null values (custom)
-        print("\nHandling null values using strategy: custom")
-        df = fill_nulls_with_custom(df, "none", 'all')
+        # Handle null values (rows)
+        print("\nHandling null values using strategy: rows")
+        df = remove_rows_with_nulls(df, 'all')
         
         # Save cleaned data
         print("\n💾 Saving cleaned data...")

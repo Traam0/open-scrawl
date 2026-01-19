@@ -111,8 +111,8 @@ export default function Page() {
                         <SelectContent>
                           <SelectGroup>
                             <SelectLabel>Suppression</SelectLabel>
-                            <SelectItem value="drop_rows">Drop_rows</SelectItem>
-                            <SelectItem value="drop_columns">
+                            <SelectItem value="rows">Drop_rows</SelectItem>
+                            <SelectItem value="columns">
                               Drop_columns
                             </SelectItem>
                           </SelectGroup>
