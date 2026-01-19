@@ -4,7 +4,7 @@ Classification with Imbalance Handling
 
 Configuration:
 - Target Variable: contract_type
-- Features: job_title, job_sector, job_function, education_level, experience_level
+- Features: job_sector, job_title
 - Model Type: DECISION TREE
 - Balancing: BOTH
 - Test Size: 20%
@@ -32,7 +32,7 @@ def detect_imbalance(y, target_name):
     Detect class imbalance in target variable.
     """
     print("=" * 80)
-    print("📊 CLASS IMBALANCE DETECTION")
+    print("CLASS IMBALANCE DETECTION")
     print("=" * 80)
     
     class_counts = pd.Series(y).value_counts()
@@ -57,13 +57,13 @@ def detect_imbalance(y, target_name):
     print(f"\nImbalance Ratio: {imbalance_ratio:.2f}:1")
     
     if imbalance_ratio > 3:
-        print("⚠️  SIGNIFICANT IMBALANCE DETECTED!")
+        print("SIGNIFICANT IMBALANCE DETECTED!")
         print("   Recommendation: Apply balancing techniques")
     elif imbalance_ratio > 1.5:
-        print("⚠️  MODERATE IMBALANCE DETECTED")
+        print("MODERATE IMBALANCE DETECTED")
         print("   Recommendation: Consider balancing techniques")
     else:
-        print("✓ Classes are relatively balanced")
+        print("Classes are relatively balanced")
     
     return {
         'imbalance_detected': imbalance_detected,
@@ -77,20 +77,17 @@ def calculate_metrics(y_true, y_pred, label_encoder):
     """
     Calculate all evaluation metrics.
     """
-    # Convert back to original labels for readability
     y_true_labels = label_encoder.inverse_transform(y_true)
     y_pred_labels = label_encoder.inverse_transform(y_pred)
     
-    # Calculate metrics
     accuracy = accuracy_score(y_true, y_pred)
     precision = precision_score(y_true, y_pred, average='weighted', zero_division=0)
     recall = recall_score(y_true, y_pred, average='weighted', zero_division=0)
     f1 = f1_score(y_true, y_pred, average='weighted', zero_division=0)
     
-    # Confusion matrix
+
     cm = confusion_matrix(y_true, y_pred)
     
-    # Per-class metrics
     report = classification_report(y_true, y_pred, output_dict=True, zero_division=0)
     
     return {
@@ -108,7 +105,7 @@ def print_metrics(model_name, metrics):
     Print metrics in a formatted way.
     """
     print(f"\n{'='*60}")
-    print(f"📈 {model_name} - Evaluation Metrics")
+    print(f" {model_name} - Evaluation Metrics")
     print(f"{'='*60}")
     print(f"  Accuracy:  {metrics['accuracy']:.4f}")
     print(f"  Precision: {metrics['precision']:.4f}")
@@ -125,45 +122,23 @@ def train_models(input_file: str, output_file: str, config: dict):
     Main training function.
     """
     start_time = datetime.now()
-    
-    print("=" * 80)
-    print("🤖 MACHINE LEARNING MODEL TRAINING")
-    print("=" * 80)
-    print(f"📂 Input: {input_file}")
-    print(f"📂 Output: {output_file}")
-    print()
-    
+        
     try:
-        # Load data
         print("Loading dataset...")
         df = pd.read_csv(input_file)
-        print(f"✓ Loaded {len(df)} samples with {len(df.columns)} columns")
         
-        # Prepare features and target
         target_col = config['target']
         feature_cols = config['features']
         
-        print(f"\nTarget variable: {target_col}")
-        print(f"Feature columns: {', '.join(feature_cols)}")
         
-        # Remove rows with missing target
         df = df[df[target_col].notna()]
-        print(f"\nSamples after removing null targets: {len(df)}")
         
-        # Encode target variable
         le = LabelEncoder()
         y = le.fit_transform(df[target_col].astype(str))
         
-        # Detect imbalance
         imbalance_info = detect_imbalance(y, target_col)
         
-        # Prepare features
         X = df[feature_cols].copy()
-        
-        # Encode categorical features
-        print("\n" + "=" * 80)
-        print("🔄 ENCODING CATEGORICAL VARIABLES")
-        print("=" * 80)
         
         encoders = {}
         for col in X.columns:
@@ -174,15 +149,9 @@ def train_models(input_file: str, output_file: str, config: dict):
                 X[col] = le_feat.fit_transform(X[col].astype(str))
                 encoders[col] = le_feat
         
-        # Fill remaining NaN with 0
         X = X.fillna(0)
         
-        print(f"\n✓ Feature matrix shape: {X.shape}")
-        
-        # Split data
-        print("\n" + "=" * 80)
-        print("📊 TRAIN-TEST SPLIT")
-        print("=" * 80)
+        print(f"\n Feature matrix shape: {X.shape}")
         
         X_train, X_test, y_train, y_test = train_test_split(
             X, y, test_size=0.2, random_state=42, stratify=y
@@ -190,12 +159,7 @@ def train_models(input_file: str, output_file: str, config: dict):
         
         print(f"  Training set: {X_train.shape[0]} samples")
         print(f"  Test set: {X_test.shape[0]} samples")
-        
-        # Train baseline model
-        print("\n" + "=" * 80)
-        print("🎯 TRAINING BASELINE MODEL (No Balancing)")
-        print("=" * 80)
-        
+                
         model_baseline = DecisionTreeClassifier(random_state=42)
         model_baseline.fit(X_train, y_train)
         y_pred_baseline = model_baseline.predict(X_test)
@@ -203,10 +167,6 @@ def train_models(input_file: str, output_file: str, config: dict):
         metrics_baseline = calculate_metrics(y_test, y_pred_baseline, le)
         print_metrics("Baseline Model", metrics_baseline)
         
-        # Train balanced models
-        print("\n" + "=" * 80)
-        print("⚖️  TRAINING BALANCED MODELS")
-        print("=" * 80)
 
         # Apply SMOTE for oversampling minority class
         print("\nApplying SMOTE...")
@@ -234,7 +194,6 @@ def train_models(input_file: str, output_file: str, config: dict):
         print_metrics("Class-Weighted Model", metrics_balanced_weights)
 
         
-        # Prepare results
         results = {
             'configuration': config,
             'dataset_info': {
@@ -254,9 +213,7 @@ def train_models(input_file: str, output_file: str, config: dict):
                 }
             },
             'training_date': datetime.now().isoformat()
-        }
-        
-        # Add balanced model results
+        }        
 
         results['models']['smote_balanced'] = {
             'model_type': 'decision_tree',
@@ -270,14 +227,9 @@ def train_models(input_file: str, output_file: str, config: dict):
             'metrics': metrics_balanced_weights
         }
         
-        # Save results
+        
         with open(output_file, 'w', encoding='utf-8') as f:
             json.dump(results, f, indent=2, ensure_ascii=False)
-        
-        # Summary
-        print("\n" + "=" * 80)
-        print("📊 TRAINING SUMMARY")
-        print("=" * 80)
         
         print("\nModel Comparison (F1-Score):")
         print(f"  Baseline: {metrics_baseline['f1_score']:.4f}")
@@ -288,12 +240,12 @@ def train_models(input_file: str, output_file: str, config: dict):
         end_time = datetime.now()
         execution_time = (end_time - start_time).total_seconds()
         
-        print(f"\n⏱️  Total execution time: {execution_time:.2f} seconds")
-        print(f"📁 Results saved to: {output_file}")
+        print(f"\n⏱Total execution time: {execution_time:.2f} seconds")
+        print(f"Results saved to: {output_file}")
         print("=" * 80)
         
     except Exception as e:
-        print(f"\n❌ Error: {e}")
+        print(f"\nError: {e}")
         import traceback
         traceback.print_exc()
         sys.exit(1)
@@ -305,7 +257,7 @@ if __name__ == "__main__":
     
     CONFIG = {
         'target': 'contract_type',
-        'features': ["job_title","job_sector","job_function","education_level","experience_level"],
+        'features': ["job_sector","job_title"],
         'model_type': 'decision_tree',
         'balancing': 'both',
         'test_size': 0.2,

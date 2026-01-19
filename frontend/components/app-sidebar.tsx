@@ -35,6 +35,7 @@ import {
   BrushCleaning,
   ChartArea,
   Database,
+  FileOutput,
   Globe,
   TrendingUpDown,
 } from "lucide-react";
@@ -144,19 +145,9 @@ const data = {
   ],
   documents: [
     {
-      name: "Data Library",
+      name: "Recrute.ma",
       url: "#",
-      icon: IconDatabase,
-    },
-    {
-      name: "Reports",
-      url: "#",
-      icon: IconReport,
-    },
-    {
-      name: "Word Assistant",
-      url: "#",
-      icon: IconFileWord,
+      icon: FileOutput,
     },
   ],
 };

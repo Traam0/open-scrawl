@@ -543,9 +543,9 @@ export default function VisualizationPage() {
                                   {item.value}
                                 </span>
                                 <div className="flex items-center gap-4">
-                                  <div className="w-32 bg-gray-200 rounded-full h-2">
+                                  <div className="w-32 bg-foreground rounded-full h-2">
                                     <div
-                                      className="bg-blue-600 h-2 rounded-full"
+                                      className="bg-primary h-2 rounded-full"
                                       style={{ width: `${item.percentage}%` }}
                                     />
                                   </div>

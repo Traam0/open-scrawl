@@ -1,4 +1,3 @@
-import { Children } from "react";
 import { AppSidebar } from "./app-sidebar";
 import { SidebarInset, SidebarProvider } from "./ui/sidebar";
 import { ScrollArea } from "./ui/scroll-area";
@@ -13,7 +12,7 @@ export default function Layout({ children }: any) {
         } as React.CSSProperties
       }
     >
-      <AppSidebar variant="inset" />
+      <AppSidebar variant="floating" />
       <SidebarInset className="h-[calc(100vh-var(--spacing)*12)]">
         <ScrollArea className="h-full">{children}</ScrollArea>
       </SidebarInset>

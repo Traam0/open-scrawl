@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import {
   Brain,
@@ -20,6 +20,22 @@ import {
   TrendingUp,
   AlertTriangle,
 } from "lucide-react";
+import {
+  Select,
+  SelectValue,
+  SelectTrigger,
+  SelectGroup,
+  SelectItem,
+  SelectContent,
+} from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 export default function MLTrainingPage() {
   const [config, setConfig] = useState({
@@ -40,7 +56,6 @@ export default function MLTrainingPage() {
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState("");
 
-  // Load available columns from cleaned data
   useEffect(() => {
     loadColumns();
     loadExistingResults();
@@ -52,7 +67,6 @@ export default function MLTrainingPage() {
       if (response.ok) {
         const data = await response.json();
         setAvailableColumns(data.columns.map((c: any) => c.name));
-        
       }
     } catch (err) {
       console.error("Failed to load columns:", err);
@@ -169,21 +183,25 @@ export default function MLTrainingPage() {
                 {/* Target Variable */}
                 <Field>
                   <FieldLabel htmlFor="target">Target Variable</FieldLabel>
-                  <select
-                    id="target"
+                  <Select
                     value={config.targetVariable}
-                    onChange={(e) =>
-                      setConfig({ ...config, targetVariable: e.target.value })
+                    onValueChange={(e) =>
+                      setConfig({ ...config, targetVariable: e })
                     }
-                    className="w-full px-3 py-2 border rounded-md"
                   >
-                    <option value="">Select target variable...</option>
-                    {availableColumns.map((col) => (
-                      <option key={col} value={col}>
-                        {col}
-                      </option>
-                    ))}
-                  </select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select target variable..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        {availableColumns.map((col) => (
+                          <SelectItem key={col} value={col}>
+                            {col}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
                   <p className="text-xs text-muted-foreground mt-1">
                     The column you want to predict (e.g., contract_type,
                     experience_level)
@@ -199,7 +217,7 @@ export default function MLTrainingPage() {
                       .map((col) => (
                         <label
                           key={col}
-                          className="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-2 rounded"
+                          className="flex items-center gap-2 cursor-pointer hover:bg-accent p-2 rounded"
                         >
                           <input
                             type="checkbox"
@@ -219,22 +237,27 @@ export default function MLTrainingPage() {
                 {/* Model Type */}
                 <Field>
                   <FieldLabel htmlFor="model">Model Type</FieldLabel>
-                  <select
-                    id="model"
+                  <Select
                     value={config.modelType}
-                    onChange={(e) =>
+                    onValueChange={(e) =>
                       setConfig({
                         ...config,
-                        modelType: e.target.value as
-                          | "decision_tree"
-                          | "random_forest",
+                        modelType: e as "decision_tree" | "random_forest",
                       })
                     }
-                    className="w-full px-3 py-2 border rounded-md"
                   >
-                    <option value="decision_tree">Decision Tree</option>
-                    <option value="random_forest">Random Forest</option>
-                  </select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Choose a model" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="decision_tree">
+                        Decision Tree
+                      </SelectItem>
+                      <SelectItem value="random_forest">
+                        Random Forest
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
                 </Field>
 
                 {/* Balancing Technique */}
@@ -265,7 +288,6 @@ export default function MLTrainingPage() {
                   </p>
                 </Field>
 
-                {/* Test Size */}
                 <Field>
                   <FieldLabel htmlFor="testsize">Test Set Size</FieldLabel>
                   <Input
@@ -312,10 +334,9 @@ export default function MLTrainingPage() {
               </CardContent>
             </Card>
 
-            {/* Error Display */}
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg flex items-start gap-2">
-                <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
                 <div>
                   <p className="font-semibold">Error</p>
                   <p className="text-sm">{error}</p>
@@ -369,222 +390,221 @@ export default function MLTrainingPage() {
                   </CardContent>
                 </Card>
 
-                {/* Imbalance Analysis */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      {result.imbalance_analysis.imbalance_detected ? (
-                        <AlertTriangle className="w-5 h-5 text-yellow-600" />
-                      ) : (
-                        <CheckCircle className="w-5 h-5 text-green-600" />
-                      )}
-                      Class Imbalance Analysis
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
-                      <div>
-                        <p className="text-sm text-muted-foreground">
-                          Imbalance Ratio
-                        </p>
-                        <p className="text-3xl font-bold">
-                          {result.imbalance_analysis.imbalance_ratio.toFixed(2)}
-                          :1
-                        </p>
-                      </div>
-                      {result.imbalance_analysis.imbalance_ratio > 3 && (
-                        <div className="text-right">
-                          <p className="text-sm font-semibold text-yellow-600">
-                            ⚠️ Significant Imbalance
+                <div className="flex flex-col lg:flex-row gap-3  justify-between">
+                  {/* Imbalance Analysis */}
+                  <Card className="flex-1">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        {result.imbalance_analysis.imbalance_detected ? (
+                          <AlertTriangle className="w-5 h-5 text-yellow-600" />
+                        ) : (
+                          <CheckCircle className="w-5 h-5 text-green-600" />
+                        )}
+                        Class Imbalance Analysis
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="flex items-center justify-between p-4 bg-accent  text-accent-foreground  rounded-lg">
+                        <div>
+                          <p className="text-sm text-muted-foreground">
+                            Imbalance Ratio
                           </p>
-                          <p className="text-xs text-muted-foreground">
-                            Balancing recommended
+                          <p className="text-3xl font-bold">
+                            {result.imbalance_analysis.imbalance_ratio.toFixed(
+                              2,
+                            )}
+                            :1
                           </p>
                         </div>
-                      )}
-                    </div>
-
-                    <div>
-                      <p className="text-sm font-medium mb-3">
-                        Class Distribution:
-                      </p>
-                      <div className="space-y-2">
-                        {Object.entries(
-                          result.imbalance_analysis.class_distribution,
-                        ).map(([cls, count]: [string, any]) => {
-                          const percentage =
-                            result.imbalance_analysis.class_percentages[cls];
-                          return (
-                            <div key={cls} className="space-y-1">
-                              <div className="flex items-center justify-between text-sm">
-                                <span className="font-medium">{cls}</span>
-                                <span className="text-muted-foreground">
-                                  {count} samples ({percentage.toFixed(2)}%)
-                                </span>
-                              </div>
-                              <div className="w-full bg-gray-200 rounded-full h-2">
-                                <div
-                                  className="bg-blue-600 h-2 rounded-full"
-                                  style={{ width: `${percentage}%` }}
-                                />
-                              </div>
-                            </div>
-                          );
-                        })}
+                        {result.imbalance_analysis.imbalance_ratio > 3 && (
+                          <div className="text-right">
+                            <p className="text-sm font-semibold text-yellow-600">
+                              ⚠️ Significant Imbalance
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              Balancing recommended
+                            </p>
+                          </div>
+                        )}
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Model Comparison */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Model Performance Comparison</CardTitle>
-                    <CardDescription>
-                      Evaluation metrics for baseline and balanced models
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="overflow-x-auto">
-                      <table className="w-full">
-                        <thead>
-                          <tr className="border-b">
-                            <th className="px-4 py-2 text-left text-sm font-medium">
-                              Model
-                            </th>
-                            <th className="px-4 py-2 text-center text-sm font-medium">
-                              Accuracy
-                            </th>
-                            <th className="px-4 py-2 text-center text-sm font-medium">
-                              Precision
-                            </th>
-                            <th className="px-4 py-2 text-center text-sm font-medium">
-                              Recall
-                            </th>
-                            <th className="px-4 py-2 text-center text-sm font-medium">
-                              F1-Score
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {Object.entries(result.models).map(
-                            ([name, model]: [string, any]) => (
-                              <tr
-                                key={name}
-                                className="border-b hover:bg-slate-50"
-                              >
-                                <td className="px-4 py-3 font-medium">
-                                  {name === "baseline"
-                                    ? "Baseline (No Balancing)"
-                                    : name === "smote_balanced"
-                                      ? "SMOTE Balanced"
-                                      : "Class Weighted"}
-                                </td>
-                                <td
-                                  className={`px-4 py-3 text-center font-mono ${getMetricColor(model.metrics.accuracy)}`}
-                                >
-                                  {model.metrics.accuracy.toFixed(4)}
-                                </td>
-                                <td
-                                  className={`px-4 py-3 text-center font-mono ${getMetricColor(model.metrics.precision)}`}
-                                >
-                                  {model.metrics.precision.toFixed(4)}
-                                </td>
-                                <td
-                                  className={`px-4 py-3 text-center font-mono ${getMetricColor(model.metrics.recall)}`}
-                                >
-                                  {model.metrics.recall.toFixed(4)}
-                                </td>
-                                <td
-                                  className={`px-4 py-3 text-center font-mono font-bold ${getMetricColor(model.metrics.f1_score)}`}
-                                >
-                                  {model.metrics.f1_score.toFixed(4)}
-                                </td>
-                              </tr>
-                            ),
-                          )}
-                        </tbody>
-                      </table>
-                    </div>
-
-                    <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-                      <p className="text-sm text-blue-800">
-                        💡 <strong>Note:</strong> F1-Score is the harmonic mean
-                        of precision and recall, providing a balanced measure
-                        especially useful for imbalanced datasets.
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
+                      <div>
+                        <p className="text-sm font-medium mb-3">
+                          Class Distribution:
+                        </p>
+                        <div className="space-y-2">
+                          {Object.entries(
+                            result.imbalance_analysis.class_distribution,
+                          ).map(([cls, count]: [string, any]) => {
+                            const percentage =
+                              result.imbalance_analysis.class_percentages[cls];
+                            return (
+                              <div key={cls} className="space-y-1">
+                                <div className="flex items-center justify-between text-sm">
+                                  <span className="font-medium">{cls}</span>
+                                  <span className="text-muted-foreground">
+                                    {count} samples ({percentage.toFixed(2)}%)
+                                  </span>
+                                </div>
+                                <div className="w-full bg-secondary rounded-full h-2">
+                                  <div
+                                    className="bg-primary h-2 rounded-full"
+                                    style={{ width: `${percentage}%` }}
+                                  />
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  {/* Model Comparison */}
+                  <Card className="flex-1">
+                    <CardHeader>
+                      <CardTitle>Model Performance Comparison</CardTitle>
+                      <CardDescription>
+                        Evaluation metrics for baseline and balanced models
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="overflow-x-auto">
+                        <Table>
+                          <TableHeader>
+                            <TableRow className="border-b">
+                              <TableHead className="font-medium">
+                                Model
+                              </TableHead>
+                              <TableHead className="font-medium">
+                                Accuracy
+                              </TableHead>
+                              <TableHead className="font-medium">
+                                Precision
+                              </TableHead>
+                              <TableHead className="font-medium">
+                                Recall
+                              </TableHead>
+                              <TableHead className="font-medium">
+                                F1-Score
+                              </TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {Object.entries(result.models).map(
+                              ([name, model]: [string, any]) => (
+                                <TableRow key={name}>
+                                  <TableCell className="font-medium">
+                                    {name === "baseline"
+                                      ? "Baseline (No Balancing)"
+                                      : name === "smote_balanced"
+                                        ? "SMOTE Balanced"
+                                        : "Class Weighted"}
+                                  </TableCell>
+                                  <TableCell
+                                    className={`px-4 py-3 text-center font-mono ${getMetricColor(model.metrics.accuracy)}`}
+                                  >
+                                    {model.metrics.accuracy.toFixed(4)}
+                                  </TableCell>
+                                  <TableCell
+                                    className={`px-4 py-3 text-center font-mono ${getMetricColor(model.metrics.precision)}`}
+                                  >
+                                    {model.metrics.precision.toFixed(4)}
+                                  </TableCell>
+                                  <TableCell
+                                    className={`px-4 py-3 text-center font-mono ${getMetricColor(model.metrics.recall)}`}
+                                  >
+                                    {model.metrics.recall.toFixed(4)}
+                                  </TableCell>
+                                  <TableCell
+                                    className={`px-4 py-3 text-center font-mono font-bold ${getMetricColor(model.metrics.f1_score)}`}
+                                  >
+                                    {model.metrics.f1_score.toFixed(4)}
+                                  </TableCell>
+                                </TableRow>
+                              ),
+                            )}
+                          </TableBody>
+                        </Table>
+                      </div>
+                      <div className="mt-4 p-3 bg-accent text-accent-foreground rounded-lg text-sm">
+                        <p>
+                          💡 <strong>Note:</strong> F1-Score is the harmonic
+                          mean of precision and recall, providing a balanced
+                          measure especially useful for imbalanced datasets.
+                        </p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
 
                 {/* Confusion Matrices */}
-                {Object.entries(result.models).map(
-                  ([name, model]: [string, any]) => (
-                    <Card key={name}>
-                      <CardHeader>
-                        <CardTitle>
-                          Confusion Matrix -{" "}
-                          {name === "baseline"
-                            ? "Baseline"
-                            : name === "smote_balanced"
-                              ? "SMOTE"
-                              : "Class Weighted"}
-                        </CardTitle>
-                        <CardDescription>
-                          Actual vs Predicted class distribution
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="overflow-x-auto">
-                          <table className="border-collapse">
-                            <thead>
-                              <tr>
-                                <th className="border p-2 bg-slate-100"></th>
-                                {result.dataset_info.target_classes.map(
-                                  (cls: string) => (
-                                    <th
-                                      key={cls}
-                                      className="border p-2 bg-slate-100 text-sm"
-                                    >
-                                      Pred: {cls}
-                                    </th>
+                <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+                  {Object.entries(result.models).map(
+                    ([name, model]: [string, any]) => (
+                      <Card key={name}>
+                        <CardHeader>
+                          <CardTitle>
+                            Confusion Matrix -{" "}
+                            {name === "baseline"
+                              ? "Baseline"
+                              : name === "smote_balanced"
+                                ? "SMOTE"
+                                : "Class Weighted"}
+                          </CardTitle>
+                          <CardDescription>
+                            Actual vs Predicted class distribution
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="overflow-x-auto">
+                            <table className="border-collapse">
+                              <thead>
+                                <tr>
+                                  <th className="border p-2 bg-accent"></th>
+                                  {result.dataset_info.target_classes.map(
+                                    (cls: string) => (
+                                      <th
+                                        key={cls}
+                                        className="border p-2 bg-accent text-sm"
+                                      >
+                                        Pred: {cls}
+                                      </th>
+                                    ),
+                                  )}
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {model.metrics.confusion_matrix.map(
+                                  (row: number[], i: number) => (
+                                    <tr key={i}>
+                                      <th className="border p-2 bg-accent text-sm">
+                                        Actual:{" "}
+                                        {result.dataset_info.target_classes[i]}
+                                      </th>
+                                      {row.map((cell, j) => (
+                                        <td
+                                          key={j}
+                                          className={`border p-2 text-center font-mono ${
+                                            i === j
+                                              ? "bg-chart-2/60 font-bold"
+                                              : "bg-chart-"
+                                          }`}
+                                        >
+                                          {cell}
+                                        </td>
+                                      ))}
+                                    </tr>
                                   ),
                                 )}
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {model.metrics.confusion_matrix.map(
-                                (row: number[], i: number) => (
-                                  <tr key={i}>
-                                    <th className="border p-2 bg-slate-100 text-sm">
-                                      Actual:{" "}
-                                      {result.dataset_info.target_classes[i]}
-                                    </th>
-                                    {row.map((cell, j) => (
-                                      <td
-                                        key={j}
-                                        className={`border p-2 text-center font-mono ${
-                                          i === j
-                                            ? "bg-green-50 font-bold"
-                                            : "bg-white"
-                                        }`}
-                                      >
-                                        {cell}
-                                      </td>
-                                    ))}
-                                  </tr>
-                                ),
-                              )}
-                            </tbody>
-                          </table>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ),
-                )}
-
+                              </tbody>
+                            </table>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ),
+                  )}
+                </div>
                 {/* Best Model Recommendation */}
-                <Card className="border-green-200 bg-green-50">
+                <Card className="border-border bg-card">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <TrendingUp className="w-5 h-5 text-green-600" />
